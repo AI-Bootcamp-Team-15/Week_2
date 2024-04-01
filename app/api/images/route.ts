@@ -8,7 +8,7 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   const { message } = await req.json();
-  const prompt = `Generate illustration for this joke: {${message}}. Don't use any text in the illustration`;
+  const prompt = `Generate image that describes this joke (Don't use any text in the illustration): ${message}.`;
   const response = await openai.images.generate({
     model: "dall-e-2",
     prompt: prompt.substring(0, Math.min(prompt.length, 1000)),
