@@ -1,10 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "ai/react";
+
+// Helper component for rendering a loading spinner
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="loader">
+      <div className="animate-pulse flex space-x-4">
+        <div className="rounded-full bg-slate-700 h-10 w-10"></div>
+      </div>
+    </div>
+  </div>
+);
+
+interface ImageDisplayProps {
+  image: string | null; // Assuming 'image' is a base64 encoded string or null
+  message: string; // Assuming 'message' is always a string
+}
+
+const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, message }) => (
+  <div className="flex flex-col items-center justify-center h-screen">
+    {image && (
+      <img src={`data:image/jpeg;base64,${image}`} alt="Generated Content" className="max-w-md max-h-full" />
+    )}
+    <p className="mt-4 w-full max-w-md text-center text-white bg-black p-4">{message}</p>
+  </div>
+);
 
 export default function Chat() {
   const { messages, append, isLoading } = useChat();
+  const [imageIsLoading, setImageIsLoading] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
+
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const topics = [
     { emoji: "😂", value: "Humor" },
     { emoji: "🎭", value: "Comedy" },
@@ -137,7 +174,27 @@ export default function Chat() {
           >
             Generate Story
           </button>
-
+          <button
+            className="bg-blue-500 p-2 text-white rounded shadow-xl"
+            disabled={isLoading}
+            onClick={async () => {
+              setImageIsLoading(true)
+              const response = await fetch("api/images", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  message: messages[messages.length - 1].content,
+                }),
+              });
+              const data = await response.json();
+              setImage(data);
+              setImageIsLoading(false);
+            }}
+          >
+            Generate image
+          </button>
           <div
             hidden={
               messages.length === 0 ||
@@ -149,6 +206,8 @@ export default function Chat() {
           </div>
         </div>
       </div>
+      {imageIsLoading && <LoadingSpinner />}
+      {image && !imageIsLoading && <ImageDisplay image={image} message={messages[messages.length - 1]?.content} />}
     </main>
   );
 }
