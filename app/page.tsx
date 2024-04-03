@@ -22,9 +22,16 @@ interface ImageDisplayProps {
 const ImageDisplay: React.FC<ImageDisplayProps> = ({ image, message }) => (
   <div className="flex flex-col items-center justify-center h-screen">
     {image && (
-      <img src={`data:image/jpeg;base64,${image}`} alt="Generated Content" className="max-w-md max-h-full" />
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={`data:image/jpeg;base64,${image}`}
+        alt="Generated Content"
+        className="max-w-md max-h-full"
+      />
     )}
-    <p className="mt-4 w-full max-w-md text-center text-white bg-black p-4">{message}</p>
+    <p className="mt-4 w-full max-w-md text-center text-white bg-black p-4">
+      {message}
+    </p>
   </div>
 );
 
@@ -72,7 +79,12 @@ export default function Chat() {
     { emoji: "📖", value: "Story-based" },
   ];
 
-  const [state, setState] = useState({ topic: "", tone: "", type: "" });
+  const [state, setState] = useState({
+    message: "",
+    topic: "",
+    tone: "",
+    type: "",
+  });
 
   const handleChange = ({
     target: { name, value },
@@ -176,16 +188,16 @@ export default function Chat() {
           </button>
           <button
             className="bg-blue-500 p-2 text-white rounded shadow-xl"
-            disabled={isLoading}
+            disabled={isLoading || !state.topic || !state.tone || !state.type}
             onClick={async () => {
-              setImageIsLoading(true)
+              setImageIsLoading(true);
               const response = await fetch("api/images", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  message: messages[messages.length - 1].content,
+                  message: messages[messages.length - 1]?.content,
                 }),
               });
               const data = await response.json();
@@ -207,7 +219,12 @@ export default function Chat() {
         </div>
       </div>
       {imageIsLoading && <LoadingSpinner />}
-      {image && !imageIsLoading && <ImageDisplay image={image} message={messages[messages.length - 1]?.content} />}
+      {image && !imageIsLoading && (
+        <ImageDisplay
+          image={image}
+          message={messages[messages.length - 1]?.content}
+        />
+      )}
     </main>
   );
 }
