@@ -13,4 +13,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Description
 
-This app offers an interactive interface designed for generating jokes tailored to specific topics, tones, and types. Upon user selection, it dynamically generates a joke and presents it within a chat-like interface
+This app offers an interactive interface designed for generating jokes tailored to specific topics, tones, and types. Upon user selection, it dynamically generates a joke and presents it within a chat-like interface. It also generates image illustration for generated joke.
+
+## Generated example
+"Why don't elephants use computers? Because they're afraid of the mouse!"
+
+![image](https://github.com/AI-Bootcamp-Team-15/Week_2/assets/16964506/377f91da-c0aa-4679-a677-f13600283346)
+
+
+
